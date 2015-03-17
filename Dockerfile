@@ -1,3 +1,3 @@
 FROM gliderlabs/alpine:3.1
-RUN apk-install openssh-client
+RUN apk update && apk-install openssh-client
 ENTRYPOINT ["ssh"]
