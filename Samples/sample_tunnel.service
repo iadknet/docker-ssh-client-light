@@ -1,0 +1,19 @@
+[Unit]
+Description=Sample Docker SSH Tunnel
+ConditionPathExists=|/usr/bin
+After=network.target
+
+[Service]
+User=tunnel_user
+ExecStart=/TimeoutStartSec=0
+ExecStartPre=-/usr/bin/docker kill sample_tunnel
+ExecStartPre=-/usr/bin/docker rm sample_tunnel
+ExecStartPre=/usr/bin/docker pull iadknet/ssh-client
+ExecStart=/usr/bin/docker run -d --name sample_tunnel -p 27017:27017 -v /path/to/tunnel_user/.ssh/id_rsa:/ssh_key/id_rsa:ro iadknet/ssh-client-light -NTC -o ServerAliveInterval=60 -o ExitOnForwardFailure=yes -o StrictHostKeyChecking=no -L 27017:localhost:27017 tunnel_user@my.mongodb.server -p 22 -i "/ssh_key/id_rsa"
+
+# Restart every >2 seconds to avoid StartLimitInterval failure
+RestartSec=3
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
